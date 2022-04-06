@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,35 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('v1')->name('v1.')->group(function () {
+    Route::prefix('items')->name('items.')->group(function () {
+
+        // User single operations
+        Route::get('', [ ItemController::class, 'all' ])->name('all');
+        Route::get('{id}', [ ItemController::class, 'find' ])->name('find');
+        Route::post('', [ ItemController::class, 'create' ])->name('create');
+        Route::patch('{id}', [ ItemController::class, 'update' ])->name('update');
+        Route::delete('{id}', [ ItemController::class, 'delete' ])->name('delete');
+        Route::patch('restore/{id}', [ ItemController::class, 'restore' ])->name('restore');
+        // TODO Add bulk create, find, update, delete and restore operations
+        Route::get('bulk/{ids}', [ ItemController::class, 'bulkFind' ])->name('bulkFind');
+        // TODO Add global create, find, update, delete and restore operations
+
+        // Admin single operations (TODO requires authentication)
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('all', [ ItemController::class, 'adminAll' ])->name('all');
+            Route::get('find/{id}', [ ItemController::class, 'adminFind' ])->name('find');
+            // Route::post('', [ ItemController::class, 'adminCreate' ])->name('create');
+            Route::patch('{id}', [ ItemController::class, 'adminUpdate' ])->name('update');
+            Route::delete('{id}', [ ItemController::class, 'adminDelete' ])->name('delete');
+            Route::patch('restore/{id}', [ ItemController::class, 'adminRestore' ])->name('restore');
+
+            // Admin bulk operations
+            // TODO Add bulk create, find, update, delete, restore
+            // Route::patch('all', [ ItemController::class, 'adminUpdateAll' ])->name('updateAll');
+            Route::delete('all', [ ItemController::class, 'adminDeleteAll' ])->name('deleteAll');
+            // Route::patch('all', [ ItemController::class, 'restoreAll' ]);
+        });
+    });
+    
 });
