@@ -197,7 +197,21 @@ class ItemController extends Controller
 
     public function bulkFind($ids)
     {
-        dd($ids);
+        $exploded_ids = explode(',', $ids);
+
+        $items = [];
+        foreach ($exploded_ids as $key => $id) {
+            $item = Item::find($id);
+            if ($item) {
+                $items[$id] = $item;
+            }
+        }
+
+        if($items){
+            return response()->json($items, 200);
+        }
+
+        return response()->json(['error' => 'Items not found'], 404);
     }
 
     // Admin single operations
