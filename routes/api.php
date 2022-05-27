@@ -27,7 +27,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
         Route::patch('restore/{id}', [ ItemController::class, 'restore' ])->name('restore');
         // TODO Add bulk create, find, update, delete and restore operations
         Route::get('bulk/{ids}', [ ItemController::class, 'bulkFind' ])->name('bulkFind');
-        // TODO Add global create, find, update, delete and restore operations
+        Route::post('bulk', [ ItemController::class, 'bulkCreate' ])->name('bulkCreate');
 
         // Admin single operations (TODO requires authentication)
         Route::prefix('admin')->name('admin.')->group(function () {
@@ -43,6 +43,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
             // Route::patch('all', [ ItemController::class, 'adminUpdateAll' ])->name('updateAll');
             Route::delete('all', [ ItemController::class, 'adminDeleteAll' ])->name('deleteAll');
             // Route::patch('all', [ ItemController::class, 'restoreAll' ]);
+            // TODO Add global create, find, update, delete and restore operations
         });
     });
     
