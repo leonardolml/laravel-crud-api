@@ -282,8 +282,75 @@ class ItemController extends Controller
         } else {
             return response()->json(['message' => 'No data has been sent'], 400);
         }
-
         
+    }
+
+    /**
+     * Update a list of items
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function bulkUpdate(Request $request)
+    {
+        $requested_items = $request->all();
+        dd($requested_items);
+
+        if ($requested_items) {
+
+            try {
+
+                $updated_items = [];
+
+                /**
+                 * continue from here...
+                 */
+                $failed_items = [];
+                DB::beginTransaction();
+                
+                foreach ($requested_items as $item) {
+    
+                    $validator = Validator::make($item, [
+                        'name' => 'required',
+                        'value' => 'required',
+                    ]);
+    
+                    if ($validator->fails()) {
+                        $failed_items[] = [ 'item' => $item, 'errors' => $validator->errors()->all()];
+                    } else {
+                        $created_items[] = Item::create($item);
+                    }
+                }
+    
+                if ($failed_items) {
+                    DB::rollBack();
+                    $message = ['message' => 'Bad request', 'items' => $failed_items];
+                    $status_code = 400;
+                    return response()->json($message, $status_code);
+    
+                } else {
+    
+                    DB::commit();
+                    $message = ['message' => 'Items successfully created', 'items' => $created_items];
+                    $status_code = 201;
+                    return response()->json($message, $status_code);
+                    
+                }
+    
+            } catch (Exception $exception) {
+    
+                DB::rollBack();
+                
+                $message = ['error' => 'Not created. Internal server error'];
+                // $item = ['error' => $exception->getMessage()];
+                $status_code = 500;
+                return response()->json($message, $status_code);
+    
+            }
+
+        } else {
+            return response()->json(['message' => 'No data has been sent'], 400);
+        }
     }
 
     // Admin single operations
