@@ -17,17 +17,13 @@ use App\Http\Controllers\ItemController;
 
 Route::prefix('v1')->name('v1.')->group(function () {
     Route::prefix('items')->name('items.')->group(function () {
-
-        // User single operations
-        Route::get('', [ ItemController::class, 'all' ])->name('all');
-        Route::get('{id}', [ ItemController::class, 'find' ])->name('find');
-        Route::post('', [ ItemController::class, 'create' ])->name('create');
-        Route::patch('{id}', [ ItemController::class, 'update' ])->name('update');
-        Route::delete('{id}', [ ItemController::class, 'delete' ])->name('delete');
-        Route::patch('restore/{id}', [ ItemController::class, 'restore' ])->name('restore');
         // TODO Add bulk create, find, update, delete and restore operations
-        Route::get('bulk/{ids}', [ ItemController::class, 'bulkFind' ])->name('bulkFind');
-        Route::post('bulk', [ ItemController::class, 'bulkCreate' ])->name('bulkCreate');
+        Route::prefix('bulk')->name('bulk.')->group(function () {
+            Route::get('{ids}', [ ItemController::class, 'bulkFind' ])->name('find');
+            Route::post('', [ ItemController::class, 'bulkCreate' ])->name('reate');
+            Route::patch('bulk', [ ItemController::class, 'bulkUpdate' ])->name('update');
+        });
+        
 
         // Admin single operations (TODO requires authentication)
         Route::prefix('admin')->name('admin.')->group(function () {
@@ -45,6 +41,15 @@ Route::prefix('v1')->name('v1.')->group(function () {
             // Route::patch('all', [ ItemController::class, 'restoreAll' ]);
             // TODO Add global create, find, update, delete and restore operations
         });
+
+        // User single operations
+        Route::get('', [ ItemController::class, 'all' ])->name('all');
+        Route::get('{id}', [ ItemController::class, 'find' ])->name('find');
+        Route::post('', [ ItemController::class, 'create' ])->name('create');
+        Route::patch('{id}', [ ItemController::class, 'update' ])->name('update');
+        Route::delete('{id}', [ ItemController::class, 'delete' ])->name('delete');
+        Route::patch('restore/{id}', [ ItemController::class, 'restore' ])->name('restore');
+        
     });
     
 });
