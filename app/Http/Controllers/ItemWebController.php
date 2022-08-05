@@ -19,14 +19,10 @@ class ItemWebController extends Controller
      */
     public function all()
     {
-        return view('pages.item.all');
-        $items = Item::all();
-
-        if($items->isNotEmpty()){
-            return $items;
-        }
-
-        return response()->json(['message' => 'No items found'], 200);
+        // return a datatable page (ajax populated)...
+        // return view('pages.item.all_datatable');
+        // ...or a page with all items
+        return view('pages.item.all', [ 'items' => Item::all() ]);
     }
 
     /**
@@ -37,13 +33,7 @@ class ItemWebController extends Controller
      */
     public function find($id)
     {
-        $item = Item::find($id);
-
-        if($item){
-            return response()->json($item, 200);
-        }
-
-        return response()->json(['error' => 'Item not found'], 404);
+        return view('pages.item.find', [ 'item' => Item::find($id) ]);
     }
 
     /**
