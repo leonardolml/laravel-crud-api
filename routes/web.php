@@ -15,4 +15,5 @@ use App\Http\Controllers\ItemWebController;
 */
 Route::prefix('items')->name('items.')->group(function () {
     Route::get('', [ ItemWebController::class, 'all' ])->name('all');
+    Route::get('{id}', [ ItemWebController::class, 'find' ])->name('find');
 });
