@@ -52,22 +52,14 @@ class ItemWebController extends Controller
             ]);
 
             if ($validator->fails()) {
-                $message = ['errors' => $validator->errors()->all()];
-                $status_code = 400;
+                return response()->json(['errors' => $validator->errors()->all()], 400);
             } else {
-                $message = ['message' => 'Item created', 'item' => Item::create($request->all())];
-                $status_code = 201;
+                return response()->json(['message' => 'Item created', 'item' => $this->repository->create($request->all())], 201);
             }
 
         } catch (Exception $exception) {
-            
-            $message = ['error' => 'Not created. Internal server error'];
-            // $message = ['error' => $exception->getMessage()];
-            $status_code = 500;
-
+            return response()->json(['message' => 'Not created. Internal server error'], 500);
         }
-
-        return response()->json($message, $status_code);
     }
 
     /**
