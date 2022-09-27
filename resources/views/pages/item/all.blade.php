@@ -37,7 +37,8 @@
                       <td>{{ $item->updated_at ?? 'NEVER' }}</td>
                       <td>{{ $item->deleted_at ?? 'NEVER' }}</td>
                       <td>
-                        <button class="btn btn-primary" onclick="window.location.href = 'items/{{ $item->id }}'">DETAILS</button>
+                        <!-- <button class="btn btn-primary" onclick="window.location.href = 'items/{{ $item->id }}'">DETAILS</button> -->
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editItemModal" onclick="setEditItem({{ $item->id }})">EDIT</button>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-bs-itemname="{{ $item->name }}" data-bs-itemid="{{ $item->id }}">DELETE</button>
                         <!-- <button class="btn btn-danger" onclick="confirmDelete({{ $item->id }},'{{ $item->name }}')">DELETE</button> -->
                       </td>
@@ -82,7 +83,7 @@
   <div class="modal fade" id="createItemModal" tabindex="-1" aria-labelledby="createItemModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-primary text-light">
           <h5 class="modal-title" id="createItemModalLabel">Create an item</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -92,7 +93,27 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="createItemCancelButton" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-success" id="createItemConfirmButton">CREATE!</button>
+          <button type="button" class="btn btn-primary" id="createItemConfirmButton">CREATE!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- editItemModal -->
+  <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title" id="editItemModalLabel">Edit item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="editItemModalBody">
+          <input class="form-control mb-2" type="text" name="name" id="editItemNameInput" placeholder="Name">
+          <input class="form-control" type="text" name="value" id="editItemValueInput" placeholder="Value">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="editItemCancelButton" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-warning" id="editItemConfirmButton">EDIT!</button>
         </div>
       </div>
     </div>
@@ -143,6 +164,7 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 <script>
+  const items = {!! $items !!}
   const cancelButton = document.getElementById('cancelButton')
   const confirmDeleteButton = document.getElementById('confirmDeleteButton')
   confirmDeleteButton.addEventListener('click', event => {
@@ -194,6 +216,7 @@
   })
 </script>
 <script src="assets/javascript/createItemModal.js"></script>
+<script src="assets/javascript/editItemModal.js"></script>
 <script src="assets/javascript/successModal.js"></script>
 <script src="assets/javascript/errorModal.js"></script>
 @endsection
