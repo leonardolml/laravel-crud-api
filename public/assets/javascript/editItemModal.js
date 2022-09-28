@@ -2,10 +2,17 @@ const editItemModal = new bootstrap.Modal('#editItemModal', {
     backdrop: false
 })
 
+// setting up edit modal
+var setEditModal = (id) => {
+    editItem.id = items.find(item => item.id === id).id
+    document.getElementById("editItemNameInput").value = items.find(item => item.id === id).name
+    document.getElementById("editItemValueInput").value = items.find(item => item.id === id).value
+}
+
+
 // set the item to edit
 var editItem = {}
-var setEditItem = (id) => {
-    editItem.id = items.find(item => item.id === id).id;
+var setEditItem = () => {
     editItem.name = document.getElementById("editItemNameInput").value,
     editItem.value = document.getElementById("editItemValueInput").value
 }
@@ -23,7 +30,8 @@ document.getElementById("editItemConfirmButton").addEventListener('click', funct
     document.querySelectorAll("#editItemModal button").forEach(element => {
         element.setAttribute('disabled', true)
     })
-
+    // get data
+    setEditItem()
     // fetch/then/catch
     let editItemUrl = `api/v1/items/${editItem.id}`;
     fetch(editItemUrl,{

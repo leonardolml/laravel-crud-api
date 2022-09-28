@@ -38,7 +38,7 @@
                       <td>{{ $item->deleted_at ?? 'NEVER' }}</td>
                       <td>
                         <!-- <button class="btn btn-primary" onclick="window.location.href = 'items/{{ $item->id }}'">DETAILS</button> -->
-                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editItemModal" onclick="setEditItem({{ $item->id }})">EDIT</button>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editItemModal" onclick="setEditModal({{ $item->id }})">EDIT</button>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-bs-itemname="{{ $item->name }}" data-bs-itemid="{{ $item->id }}">DELETE</button>
                         <!-- <button class="btn btn-danger" onclick="confirmDelete({{ $item->id }},'{{ $item->name }}')">DELETE</button> -->
                       </td>
@@ -128,7 +128,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="successModalBody">
-          <h5 class="text-success text-center">Item created.</h5>
+          <h5 class="text-success text-center">Operation done successfully.</h5>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" id="successModalButton" data-bs-dismiss="modal">OK</button>
@@ -146,7 +146,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="errorModalBody">
-          <h5 class="text-danger text-center">Item not created.</h5>
+          <h5 class="text-danger text-center">Operation not completed.</h5>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" id="errorModalButton" data-bs-dismiss="modal">OK</button>
@@ -217,6 +217,7 @@
 </script>
 <script src="assets/javascript/createItemModal.js"></script>
 <script src="assets/javascript/editItemModal.js"></script>
+<script src="assets/javascript/deleteItemModal.js"></script>
 <script src="assets/javascript/successModal.js"></script>
 <script src="assets/javascript/errorModal.js"></script>
 @endsection
