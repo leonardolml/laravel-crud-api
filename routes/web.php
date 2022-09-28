@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemWebController;
+use App\Http\Controllers\ProfileWebController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,5 +16,9 @@ use App\Http\Controllers\ItemWebController;
 */
 Route::prefix('items')->name('items.')->group(function () {
     Route::get('', [ ItemWebController::class, 'all' ])->name('all');
-    Route::get('{id}', [ ItemWebController::class, 'find' ])->name('find');
+    // Route::get('{id}', [ ItemWebController::class, 'find' ])->name('find');
+});
+
+Route::prefix('profiles')->name('profiles.')->group(function () {
+    Route::get('', [ ProfileWebController::class, 'index' ])->name('index');
 });
