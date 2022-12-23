@@ -6,10 +6,39 @@ use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Item;
+use App\Repositories\ItemRepository;
 
-class ItemController extends Controller
+class ItemApiController extends Controller
 {
+    protected $items;
+
+    public function __construct(ItemRepository $repository)
+    {
+        $this->items = $repository;
+    }
+
+    /**
+     * Try/Catch a clousure
+     *
+     * @param  \Clousure  $function
+     * @return \Illuminate\Http\Response
+     */
+    protected function try_catch($function)
+    {
+        try {
+
+            return $function();
+            
+        } catch (Exception $exception) {
+
+            Log::error($exception->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+
+        }
+    }
+
     // User single operations
 
     /**
@@ -19,13 +48,19 @@ class ItemController extends Controller
      */
     public function all()
     {
-        $items = Item::all();
+        return $this->try_catch(            
+            function () {
 
-        if($items->isNotEmpty()){
-            return $items;
-        }
-
-        return response()->json(['message' => 'No items found'], 200);
+                $items = $this->items->all();
+                
+                if ($items->isNotEmpty()) {
+                    return response()->json(['items' => $items], 200);
+                }
+    
+                return response()->json(['message' => 'No items found'], 404);
+    
+            }
+        );
     }
 
     /**
@@ -36,13 +71,19 @@ class ItemController extends Controller
      */
     public function find($id)
     {
-        $item = Item::find($id);
+        return $this->try_catch(            
+            function () use ($id) {
+                
+                $item = $this->items->find($id);
 
-        if($item){
-            return response()->json($item, 200);
-        }
+                if ($item) {
+                    return response()->json($item, 200);
+                }
 
-        return response()->json(['error' => 'Item not found'], 404);
+                return response()->json(['error' => 'Item not found'], 404);
+    
+            }
+        );
     }
 
     /**
@@ -53,74 +94,53 @@ class ItemController extends Controller
      */
     public function create(Request $request)
     {
-        try {
-
-            $validator = Validator::make($request->all(), [
-                'name' => 'required',
-                'value' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                $message = ['errors' => $validator->errors()->all()];
-                $status_code = 400;
-            } else {
-                $message = ['message' => 'Item created', 'item' => Item::create($request->all())];
-                $status_code = 201;
+        return $this->try_catch(            
+            function () use ($request) {
+                
+                $validator = Validator::make($request->all(), [
+                    'name' => 'required',
+                    'value' => 'required',
+                ]);
+    
+                if ($validator->fails()) {
+                    return response()->json(['errors' => $validator->errors()->all()], 400);
+                } else {
+                    return response()->json(['message' => 'Created', 'item' => $this->items->create($request->all())], 201);
+                }
+    
             }
-
-        } catch (Exception $exception) {
-            
-            $message = ['error' => 'Not created. Internal server error'];
-            // $message = ['error' => $exception->getMessage()];
-            $status_code = 500;
-
-        }
-
-        return response()->json($message, $status_code);
+        );
     }
 
     /**
      * Update an item
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        try {
+        return $this->try_catch(            
+            function () use ($request) {
+                
+                $validator = Validator::make($request->all(), [
+                    'name' => 'required',
+                    'value' => 'required',
+                ]);
 
-            $validator = Validator::make($request->all(), [
-                'name' => 'required',
-                'value' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                $message = ['errors' => $validator->errors()];
-                $status_code = 400;
-            } else {
-                $item = Item::find($id);
-
-                if($item){
-                    $item->update($request->all());
-                    $message = ['message' => 'Item updated', 'item' => $item];
-                    $status_code = 200;
+                if ($validator->fails()) {
+                    return response()->json(['errors' => $validator->errors()->all()], 400);
                 } else {
-                    $message = ['error' => 'Item not found'];
-                    $status_code = 404;
+                    $item = $this->items->find($request->id);
+
+                    if ($item) {
+                        return response()->json(['message' => 'Item updated', 'item' => $this->items->update($item, $request->all())], 200);
+                    } else {
+                        return response()->json(['error' => 'Item not found'], 404);
+                    }
                 }
             }
-
-        } catch (Exception $e) {
-            
-            $message = ['error' => 'Not updated. Internal server error'];
-            // $message = ['error' => $exception->getMessage()];
-            $status_code = 500;
-
-        }
-
-        return response()->json($message, $status_code);
-
+        );
     }
 
     /**
@@ -132,22 +152,23 @@ class ItemController extends Controller
     public function delete($id)
     {
         try {
+            throw new Exception("Error Processing Request", 1);
 
             $item = Item::find($id);
 
             if($item){
-                $item->delete();
+                // $item->delete();
                 $message = ['message' => 'Item deleted', 'item' => $item];
                 $status_code = 200;
             } else {
-                $message = ['error' => 'Item not found'];
+                $message = ['message' => 'Item not found'];
                 $status_code = 404;
             }
 
         } catch (Exception $e) {
             
-            $message = ['error' => 'Not deleted. Internal server error'];
-            // $message = ['error' => $exception->getMessage()];
+            $message = ['message' => 'Not deleted. Internal server error'];
+            // $message = ['message' => $exception->getMessage()];
             $status_code = 500;
 
         }

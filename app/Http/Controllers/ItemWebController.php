@@ -7,10 +7,18 @@ use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Item;
+use App\Repositories\ItemRepository;
 
 class ItemWebController extends Controller
 {
-    // User single operations
+    protected $items;
+
+    public function __construct(ItemRepository $repository)
+    {
+        $this->items = $repository;
+    }
+
+    // Single operations
 
     /**
      * Get all active items
@@ -19,10 +27,7 @@ class ItemWebController extends Controller
      */
     public function all()
     {
-        // return a datatable page (ajax populated)...
-        // return view('pages.item.all_datatable');
-        // ...or a page with all items
-        return view('pages.item.all', [ 'items' => Item::all() ]);
+        return view('pages.item.all', [ 'items' => $this->items->all() ]);
     }
 
     /**
@@ -33,7 +38,7 @@ class ItemWebController extends Controller
      */
     public function find($id)
     {
-        return view('pages.item.find', [ 'item' => Item::find($id) ]);
+        return view('pages.item.find', [ 'item' => $this->items->find($id) ]);
     }
 
     /**
@@ -71,6 +76,7 @@ class ItemWebController extends Controller
      */
     public function update(Request $request, $id)
     {
+        dd($request);
         try {
 
             $validator = Validator::make($request->all(), [
@@ -82,10 +88,10 @@ class ItemWebController extends Controller
                 $message = ['errors' => $validator->errors()];
                 $status_code = 400;
             } else {
-                $item = Item::find($id);
+                $item = $this->repository->find($id);
 
                 if($item){
-                    $item->update($request->all());
+                    $item = $this->repository->update($request->all());
                     $message = ['message' => 'Item updated', 'item' => $item];
                     $status_code = 200;
                 } else {
